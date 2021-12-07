@@ -64,7 +64,6 @@ app.post("/urls", (req, res) => {
   // res.status(200).send();
   
 });
-
 // Redirect after form submission
 app.get("/u/:shortURL", (req, res) => {
   // const longURL = ...
@@ -75,7 +74,6 @@ app.get("/u/:shortURL", (req, res) => {
   // res.render("urls_show", templateVars);
   res.redirect(longURL);
 });
-
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
