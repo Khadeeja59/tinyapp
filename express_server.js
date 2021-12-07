@@ -15,8 +15,14 @@ app.get("/", (req, res) => {
 
 // Adding a new routeHandler for /urls and use res.render() to pass the URL data to our template. 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = { urls: urlDatabase }; //value in template variable should be in obj form.
   res.render("urls_index", templateVars);
+});
+
+// Adding a new routeHandler for /urls:shortURL, :=>shortURL is a route parameter , its value will be available in req.params obj. 
+app.get("/urls/:shortURL", (req, res) => {
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]/* What goes here? */ }; //value in template variable should be in obj form.
+  res.render("urls_show", templateVars);
 });
 
 app.listen(PORT, () => {
