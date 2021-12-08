@@ -33,7 +33,10 @@ app.get("/", (req, res) => {
 
 //-------------------------------------Adding other routes.-------------------------------------------------------------- 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase }; //value in template variable should be in obj form.
+  const templateVars = { 
+    urls: urlDatabase, 
+    username: req.cookies["username"] 
+  }; //value in template variable should be in obj form.
   res.render("urls_index", templateVars);
 });
 app.get("/urls.json", (req, res) => {
@@ -51,7 +54,10 @@ app.get("/hello", (req, res) => {
 
 //-----------------------------Adding a GET Route to Show the Form-----------------------------------------------------------------
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = { 
+    username: req.cookies["username"]
+  }
+  res.render("urls_new",templateVars);
 });
 //----------------------Adding a POST Route to Receive the Form Submission---------------------------------------
 app.post("/urls", (req, res) => {
@@ -97,7 +103,8 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   const shortURL = req.params.shortURL;
   //const longURL = req.body.longURL;
   const longURL = urlDatabase[shortURL];
-  const templateVars = {shortURL,longURL};
+  const username = req.cookies["username"]
+  const templateVars = {shortURL,longURL,username};
   res.render("urls_show",templateVars);
  })
  app.post('/urls/:shortURL', (req, res) => {
@@ -110,12 +117,24 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 });
 //----------------------------The login form (Cookies in Express)----------------------------------------------
 app.get('/login',(req,res)=>{
-  res.render('urls_new');
+  const templateVars = {
+    username: req.cookies["username"],
+    urls: urlDatabase
+    // ... any other vars
+  };
+  res.render("urls_index", templateVars);
+  
 });
 
 app.post('/login', (req,res) => {
   const username = req.body.username;
   res.cookie('username', username);
+  res.redirect('/urls');
+ });
+
+
+ app.post('/logout', (req,res) => {
+  res.clearCookie('username');
   res.redirect('/urls');
  });
 
