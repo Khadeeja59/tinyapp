@@ -90,6 +90,22 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   res.redirect('/urls');
 
 });
+//---------------------------------Updating URLS-----------------------------------------------------------
+ app.get('/urls/:shortURL',(req,res)=>{
+  const shortURL = req.params.shortURL;
+  const longURL = req.body.longURL;
+  const templateVars = {shortURL,longURL};
+  res.render("urls_show",templateVars);
+ })
+ app.post('/urls/:shortURL', (req, res) => {
+  const shortURL = req.params.shortURL;
+  const longURL = req.body.longURL;
+  urlDatabase[shortURL] = longURL;
+
+  res.redirect('/urls');
+
+});
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
