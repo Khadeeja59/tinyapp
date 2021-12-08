@@ -1,9 +1,11 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
-app.use(bodyParser.urlencoded({extended: true}));
-
+const cookieParser = require('cookie-parser')
 const PORT = 8080; // default port 8080
+
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser())
 app.set("view engine", "ejs");
 
 const urlDatabase = {
@@ -60,7 +62,7 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortURL] = longURL;
   console.log(urlDatabase);
   // res.send(shortURL);       
-  res.status(200).redirect(`/u/${shortURL}`); ///shorter version for our redirect links: /u/:shortURL
+  res.redirect(`/urls/${shortURL}`); ///shorter version for our redirect links: /u/:shortURL
   // res.status(200).send();
   
 });
@@ -93,7 +95,8 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 //---------------------------------Updating URLS-----------------------------------------------------------
  app.get('/urls/:shortURL',(req,res)=>{
   const shortURL = req.params.shortURL;
-  const longURL = req.body.longURL;
+  //const longURL = req.body.longURL;
+  const longURL = urlDatabase[shortURL];
   const templateVars = {shortURL,longURL};
   res.render("urls_show",templateVars);
  })
@@ -105,6 +108,18 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   res.redirect('/urls');
 
 });
+//----------------------------The login form (Cookies in Express)----------------------------------------------
+app.get('/login',(req,res)=>{
+  res.render('urls_new');
+});
+
+app.post('/login', (req,res) => {
+  const username = req.body.username;
+  res.cookie('username', username);
+  res.redirect('/urls');
+ });
+
+
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
