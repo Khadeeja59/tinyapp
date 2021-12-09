@@ -107,9 +107,10 @@ app.get("/urls/new", (req, res) => {
 app.post("/urls", (req, res) => {
   // console.log(req.body);  // Log the POST request body to the console
   // res.send("Ok");  // Respond with 'Ok' (we will replace this)
+  const userId = res.cookie(["user_id"]);
   const shortURL = generateRandomString(6);
   const longURL = req.body.longURL;
-  urlDatabase[shortURL].longURL = longURL;
+  urlDatabase[shortURL] = {longURL ,userId}
   console.log(urlDatabase);
   // res.send(shortURL);       
   res.redirect(`/urls/${shortURL}`); ///shorter version for our redirect links: /u/:shortURL
