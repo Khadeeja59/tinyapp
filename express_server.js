@@ -8,10 +8,22 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser())
 app.set("view engine", "ejs");
 
+// const urlDatabase = {
+//   "b2xVn2": "http://www.lighthouselabs.ca",
+//   "9sm5xK": "http://www.google.com"
+// };
+
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: {
+      longURL: "https://www.tsn.ca",
+      userID: "aJ48lW"
+  },
+  i3BoGr: {
+      longURL: "https://www.google.ca",
+      userID: "aJ48lW"
+  }
 };
+
 
 let users = { 
   "userRandomID": {
@@ -97,7 +109,7 @@ app.post("/urls", (req, res) => {
   // res.send("Ok");  // Respond with 'Ok' (we will replace this)
   const shortURL = generateRandomString(6);
   const longURL = req.body.longURL;
-  urlDatabase[shortURL] = longURL;
+  urlDatabase[shortURL].longURL = longURL;
   console.log(urlDatabase);
   // res.send(shortURL);       
   res.redirect(`/urls/${shortURL}`); ///shorter version for our redirect links: /u/:shortURL
@@ -108,7 +120,7 @@ app.post("/urls", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   // const longURL = ...
   const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL];
+  const longURL = urlDatabase[shortURL].longURL;
   console.log(longURL);
   // const templateVars = {shortURL,longURL}
   // res.render("urls_show", templateVars);
@@ -119,11 +131,7 @@ app.get("/u/:shortURL", (req, res) => {
 app.post('/urls/:shortURL/delete', (req, res) => {
 
   console.log("DELETE HERE");
-
-  // extract the id from the url
-  // req.params
   const shortURL = req.params.shortURL;
-  // delete it from the db
   delete urlDatabase[shortURL];
 
   // redirect to /quotes
@@ -136,16 +144,16 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   //const longURL = req.body.longURL;
   const newId = req.cookies["user_id"]; 
 
-  const longURL = urlDatabase[shortURL];
+  const longURL = urlDatabase[shortURL].longURL;
   //const username = req.cookies["username"]
-  const templateVars = {shortURL,longURL};
   const user = users[newId];
+  const templateVars = {shortURL,longURL,user};
   res.render("urls_show",templateVars);
  })
  app.post('/urls/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = req.body.longURL;
-  urlDatabase[shortURL] = longURL;
+  urlDatabase[shortURL].longURL = longURL;
 
   res.redirect('/urls');
 
@@ -238,6 +246,3 @@ app.post('/login', (req,res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
-
-
