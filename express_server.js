@@ -13,6 +13,20 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+let users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
+
+
 //-----------------------------------Generate a Random ShortURL---------------------------------------------------------
 function generateRandomString(n) {
   let randomString = '';
@@ -33,9 +47,11 @@ app.get("/", (req, res) => {
 
 //-------------------------------------Adding other routes.-------------------------------------------------------------- 
 app.get("/urls", (req, res) => {
+  const newId = req.cookies["user_id"];    
   const templateVars = { 
     urls: urlDatabase, 
-    username: req.cookies["username"] 
+    user: users[newId]
+     
   }; //value in template variable should be in obj form.
   res.render("urls_index", templateVars);
 });
@@ -55,7 +71,8 @@ app.get("/hello", (req, res) => {
 //-----------------------------Adding a GET Route to Show the Form-----------------------------------------------------------------
 app.get("/urls/new", (req, res) => {
   const templateVars = { 
-    username: req.cookies["username"]
+    //username: req.cookies["username"]
+    user: users
   }
   res.render("urls_new",templateVars);
 });
@@ -103,8 +120,9 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   const shortURL = req.params.shortURL;
   //const longURL = req.body.longURL;
   const longURL = urlDatabase[shortURL];
-  const username = req.cookies["username"]
+  //const username = req.cookies["username"]
   const templateVars = {shortURL,longURL,username};
+  const user = users;
   res.render("urls_show",templateVars);
  })
  app.post('/urls/:shortURL', (req, res) => {
@@ -119,7 +137,8 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 app.get('/login',(req,res)=>{
   const templateVars = {
     username: req.cookies["username"],
-    urls: urlDatabase
+    //urls: urlDatabase,
+    user: users
     // ... any other vars
   };
   res.render("urls_index", templateVars);
@@ -131,14 +150,39 @@ app.post('/login', (req,res) => {
   res.cookie('username', username);
   res.redirect('/urls');
  });
-
+//--------------------------------------Logout----------------------------------------------------------
 
  app.post('/logout', (req,res) => {
   res.clearCookie('username');
   res.redirect('/urls');
  });
 
+//-------------------------------------Registration Page------------------------------------------------------
+app.get('/register',(req,res)=>{
+  const newId = req.cookies["user_id"]
+   const templateVars = {
+    user: users[newId],
+  };
+  res.render("register", templateVars);
 
+});
+
+app.post('/register', (req,res) => {
+  const newEmail = req.body.email;
+  const newPassword = req.body.password;
+  const newId = generateRandomString(6)
+  res.cookie('user_id', newId);
+  users[newId] =  {
+        id: newId,
+        email: newEmail,
+        password: newPassword
+      }
+    
+  console.log(users);
+  // console.log(res.cookie('user_id', newId))
+ res.redirect('/urls');
+ });
+//  console.log(users);
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
