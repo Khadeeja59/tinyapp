@@ -94,20 +94,25 @@ app.get("/hello", (req, res) => {
 
 //-----------------------------Adding a GET Route to Show the Form-----------------------------------------------------------------
 app.get("/urls/new", (req, res) => {
-  const newId = req.cookies["user_id"]; 
+  const userId = req.cookies["user_id"]; 
+  if (!userId) {
+    res.redirect("/login");
+  } else {
   const templateVars = { 
     //username: req.cookies["username"]
     //user: users
      
-    user:users[newId]
+    user:users[userId]
   }
   res.render("urls_new",templateVars);
+}
 });
 //----------------------Adding a POST Route to Receive the Form Submission---------------------------------------
 app.post("/urls", (req, res) => {
   // console.log(req.body);  // Log the POST request body to the console
   // res.send("Ok");  // Respond with 'Ok' (we will replace this)
   const userId = res.cookie(["user_id"]);
+
   const shortURL = generateRandomString(6);
   const longURL = req.body.longURL;
   urlDatabase[shortURL] = {longURL ,userId}
