@@ -56,20 +56,23 @@ app.get("/", (req, res) => {
 
 //-------------------------------------Adding other routes.-------------------------------------------------------------- 
 app.get("/urls", (req, res) => {
-  const newId = req.cookies["user_id"];    
+  const userId = req.cookies["user_id"];    
   const templateVars = { 
     urls: urlDatabase, 
-    user: users[newId]
-     
+    user: users[userId]
+    //  user: users
   }; //value in template variable should be in obj form.
   res.render("urls_index", templateVars);
 });
+
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
+
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
+
 //Adding a new routeHandler for /urls:shortURL
 // app.get("/urls/:shortURL", (req, res) => {
 //   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]}; //value in template variable should be in obj form.
@@ -79,9 +82,12 @@ app.get("/hello", (req, res) => {
 
 //-----------------------------Adding a GET Route to Show the Form-----------------------------------------------------------------
 app.get("/urls/new", (req, res) => {
+  const newId = req.cookies["user_id"]; 
   const templateVars = { 
     //username: req.cookies["username"]
-    user: users
+    //user: users
+     
+    user:users[newId]
   }
   res.render("urls_new",templateVars);
 });
@@ -128,10 +134,12 @@ app.post('/urls/:shortURL/delete', (req, res) => {
  app.get('/urls/:shortURL',(req,res)=>{
   const shortURL = req.params.shortURL;
   //const longURL = req.body.longURL;
+  const newId = req.cookies["user_id"]; 
+
   const longURL = urlDatabase[shortURL];
   //const username = req.cookies["username"]
-  const templateVars = {shortURL,longURL,username};
-  const user = users;
+  const templateVars = {shortURL,longURL};
+  const user = users[newId];
   res.render("urls_show",templateVars);
  })
  app.post('/urls/:shortURL', (req, res) => {
@@ -143,28 +151,28 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 
 });
 //----------------------------The login form (Cookies in Express)----------------------------------------------
-app.get('/login',(req,res)=>{
-  const templateVars = {
-    username: req.cookies["username"],
-    //urls: urlDatabase,
-    user: users
-    // ... any other vars
-  };
-  res.render("urls_index", templateVars);
+// app.get('/login',(req,res)=>{
+//   const templateVars = {
+//     username: req.cookies["username"],
+//     //urls: urlDatabase,
+//     user: users
+//     // ... any other vars
+//   };
+//   res.render("urls_index", templateVars);
   
-});
+// });
 
-app.post('/login', (req,res) => {
-  const username = req.body.username;
-  res.cookie('username', username);
-  res.redirect('/urls');
- });
-//--------------------------------------Logout----------------------------------------------------------
+// app.post('/login', (req,res) => {
+//   const username = req.body.username;
+//   res.cookie('username', username);
+//   res.redirect('/urls');
+//  });
+// //--------------------------------------Logout----------------------------------------------------------
 
- app.post('/logout', (req,res) => {
-  res.clearCookie('username');
-  res.redirect('/urls');
- });
+//  app.post('/logout', (req,res) => {
+//   res.clearCookie('username');
+//   res.redirect('/urls');
+//  });
 
 //-------------------------------------Registration Page------------------------------------------------------
 app.get('/register',(req,res)=>{
@@ -198,8 +206,38 @@ app.post('/register', (req,res) => {
       res.redirect('/urls');
 
  });
-//  console.log(users);
+
+app.get('/login', (req,res) => {
+  const newId = req.cookies["user_id"]
+  const templateVars = {user: users[newId],};
+  res.render("login", templateVars);
+});
+
+app.post('/login', (req,res) => {
+  const newEmail = req.body.email;
+  const newPassword = req.body.password;
+  //const newId = generateRandomString(6);
+  const user = findUserByEmail(newEmail);
+  if(!user) {
+    return res.status(400).send("Your email does not exist");
+  }
+  if(user.password !== newPassword) {
+    return res.status(400).send("Wrong password");
+  }
+    res.cookie('user_id', user.id);
+    res.redirect('/urls');
+});
+// //--------------------------------------Logout----------------------------------------------------------
+
+ app.post('/logout', (req,res) => {
+  res.clearCookie('user_id');
+  res.redirect('/urls');
+ });
+
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+
+
