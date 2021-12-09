@@ -26,6 +26,15 @@ let users = {
   }
 }
 
+const findUserByEmail = (email) => {  
+   for(let userId in users) {    
+      let user = users[userId]; 
+      if(user.email === email) {     
+          return user;     
+        }   
+        }   return null; 
+      }
+
 
 //-----------------------------------Generate a Random ShortURL---------------------------------------------------------
 function generateRandomString(n) {
@@ -170,17 +179,24 @@ app.get('/register',(req,res)=>{
 app.post('/register', (req,res) => {
   const newEmail = req.body.email;
   const newPassword = req.body.password;
-  const newId = generateRandomString(6)
+  const newId = generateRandomString(6);
+
+  if (newEmail === "" || newPassword ==="") {
+    return res.status(400).send("Your email and passwords cannot be empty");
+  }
+  const user = findUserByEmail(newEmail);
+  { if(user) {
+    return res.status(400).send("The email already exists");
+  }}
   res.cookie('user_id', newId);
   users[newId] =  {
         id: newId,
         email: newEmail,
         password: newPassword
-      }
-    
-  console.log(users);
-  // console.log(res.cookie('user_id', newId))
- res.redirect('/urls');
+      };
+      
+      res.redirect('/urls');
+
  });
 //  console.log(users);
 
