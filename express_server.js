@@ -134,7 +134,7 @@ app.post("/urls", (req, res) => {
   const longURL = req.body.longURL;
   urlDatabase[shortURL] = {longURL ,userID:userId}
   // console.log(urlDatabase);
-  res.redirect(`/urls/${shortURL}`); ///shorter version for our redirect links: /u/:shortURL
+  res.redirect(`/urls/`); ///${shortURL} shorter version for our redirect links: /u/:shortURL
  
 });
 
