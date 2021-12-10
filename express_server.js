@@ -2,10 +2,11 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 //const cookieParser = require('cookie-parser');
-var cookieSession = require('cookie-session')
+const cookieSession = require('cookie-session')
 const bcrypt = require('bcryptjs');
 const salt = bcrypt.genSaltSync(10);
 const PORT = 8080; // default port 8080
+const {generateRandomString, findUserByEmail, urlsForUser} = require("./helpers");
 
 app.use(bodyParser.urlencoded({extended: true}));
 // app.use(cookieParser())
@@ -51,37 +52,6 @@ let users = {
   }
 }
 
-const findUserByEmail = (email) => {  
-   for(let userId in users) {    
-      let user = users[userId]; 
-      if(user.email === email) {
-        return user;
-      }
-    }
-    return null; 
-};
-
-const urlsForUser = (id, urlDatabase) => {
-  const userURLs = {};
-  for (let url in urlDatabase) {
-    if (id === urlDatabase[url].userID) {
-      userURLs[url] = urlDatabase[url];
-    }
-  }
-  return userURLs;
-};
-
-function generateRandomString(n) {
-  let randomString = '';
-  let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-  for ( let i = 0; i < n; i++ ) {
-    randomString += characters.charAt(Math.floor(Math.random()*characters.length));
- }
- return randomString;
-}
-
-const shortURL = generateRandomString(6);
 
 //-------------------------------------Adding other routes.--------------------------------------------------------------//
 app.get("/", (req, res) => {
@@ -108,7 +78,7 @@ app.get("/hello", (req, res) => {
 });
 
 
-//-----------------------------Adding a GET Route to Show the Form-----------------------------------------------------------------
+//-----------------------------Adding a GET Route to Show the Form-----------------------------------------------------------------//
 app.get("/urls/new", (req, res) => {
   const userId = req.session.user_id; 
   if (!userId) {
@@ -121,7 +91,7 @@ app.get("/urls/new", (req, res) => {
 }
 });
 
-//-------------------------------- Adding a new routeHandler for /urls:shortURL----------------------------------------------------
+//-------------------------------- Adding a new routeHandler for /urls:shortURL----------------------------------------------------//
 
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL
@@ -157,7 +127,7 @@ app.get("/urls/:shortURL", (req, res) => {
 //   });
  
 
-//----------------------Adding a POST Route to Receive the Form Submission---------------------------------------
+//----------------------Adding a POST Route to Receive the Form Submission---------------------------------------//
 app.post("/urls", (req, res) => {
   const userId = req.session.user_id;
   const shortURL = generateRandomString(6);
@@ -168,7 +138,7 @@ app.post("/urls", (req, res) => {
  
 });
 
-//-----------------------Redirect after form submission-----------------------------------------------------------
+//-----------------------Redirect after form submission-----------------------------------------------------------//
 app.get("/u/:shortURL", (req, res) => {
   // const longURL = ...
   const shortURL = req.params.shortURL;
@@ -179,7 +149,7 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
-//-----------------------------------Deleting URLs----------------------------------------------------------------------
+//-----------------------------------Deleting URLs----------------------------------------------------------------------//
 app.post('/urls/:shortURL/delete', (req, res) => {
   const userId = req.session.user_id;
   const shortURL = req.params.shortURL;
@@ -221,7 +191,7 @@ app.post('/register', (req,res) => {
   if (newEmail === "" || newPassword ==="") {
     return res.status(400).send("Your email and passwords cannot be empty");
   }
-  const user = findUserByEmail(newEmail);
+  const user = findUserByEmail(newEmail, users);
   if(user) {
     return res.status(400).send("The email already exists");
   }
@@ -251,8 +221,7 @@ app.get('/login', (req,res) => {
 app.post('/login', (req,res) => {
   const newEmail = req.body.email;
   const newPassword = req.body.password;
-  //const newId = generateRandomString(6);
-  const user = findUserByEmail(newEmail);
+  const user = findUserByEmail(newEmail, users);
   
   if(!user) {
     return res.status(400).send("Your email does not exist");  
