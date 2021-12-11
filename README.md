@@ -12,7 +12,8 @@ This is the /login page for users to login to their accounts.
 !["Screenshot of register page"](https://github.com/Khadeeja59/tinyapp/blob/master/docs/login_page.jpg?raw=true)
 This is the page which is used to create tiny urls for the long urls entered by the user.
 !["Screenshot of register page"](https://github.com/Khadeeja59/tinyapp/blob/master/docs/create_url.jpg?raw=true)
-
+Users can edit the URLS entered by them.
+!["Screenshot of register page"](https://github.com/Khadeeja59/tinyapp/blob/master/docs/updat_url.jpg?raw=true)
 
 ## Dependencies
 - Node.js
